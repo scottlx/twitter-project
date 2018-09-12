@@ -2,54 +2,87 @@ import tweepy
 from tweepy import OAuthHandler
 import json
 import wget
+import os
+import sys
 
-consumer_key = 'Dtm17eL6bxFBV6iDwC2THopio'
-consumer_secret = 'ftqCRzQcP7bpSlSnekpoG93RqXaMikkxV1g0hTxUxW2omdeQR4'
-access_token = '1038838122061160455-rKBGZh5ugr5x4XSf1zNwhvvvUsmLrI'
-access_secret = 'xgoMoIRHR5COsnmqCXNlAqBrT5DoC9MNn0AEpELZbzzo2'
+consumer_key = ''
+consumer_secret = ''
+access_token = ''
+access_secret = ''
 
-@classmethod
-def parse(cls, api, raw):
-    status = cls.first_parse(api, raw)
-    setattr(status, 'json', json.dumps(raw))
-    return status
-
-# Status() is the data model for a tweet
-tweepy.models.Status.first_parse = tweepy.models.Status.parse
-tweepy.models.Status.parse = parse
-# User() is the data model for a user profil
-tweepy.models.User.first_parse = tweepy.models.User.parse
-tweepy.models.User.parse = parse
-# You need to do it for all the models you need
-
+#Authentication
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 
 api = tweepy.API(auth)
 
-tweets = api.user_timeline(screen_name='miguelmalvarez',
-                           count=5, include_rts=False,
-                           exclude_replies=True)
-last_id = tweets[-1].id
+username = input("\nEnter the twitter handle of the Account to download media from: ")
+max_tweets = int(input("\nEnter Max. number of tweets to search (0 for all tweets): "))
+#try:
+#	u=api.get_user(username)
+#	print (u.id_str)
+#	print (u.screen_name)
+#except Exception as e:
+#	print (e)
+#	sys.exit()
 
-while (True):
-    more_tweets = api.user_timeline(screen_name='miguelmalvarez',
-                                count=5,
-                                include_rts=False,
-                                exclude_replies=True,
-                                max_id=last_id-1)
-# There are no more tweets
-    if (len(more_tweets) == 0):
-        break
-    else:
-        last_id = more_tweets[-1].id-1
-        tweets = tweets + more_tweets
+## Getting Tweets from a user with the handle 'username' upto max of 'max_tweets' tweets
+last_tweet_id = 0
+num_images = 0
+try:
+    raw_tweets = api.user_timeline(screen_name=username,include_rts=False,exclude_replies=True)  #exclude retweets and replies
+except Exception as e:
+	print (e)
+	sys.exit()
 
-media_files = set()
-for status in tweets:
-    media = status.entities.get('media', [])
-    if(len(media) > 0):
-        media_files.add(media[0]['media_url'])
+last_tweet_id = int(raw_tweets[-1].id-1)
+	
+print ('\nFetching tweets.....')
 
-for media_file in media_files:
-    wget.download(media_file)
+if max_tweets == 0:
+	max_tweets = 3500   #if max_tweets is 0, fetch all tweets
+
+while len(raw_tweets)<max_tweets:
+	sys.stdout.write("\rTweets fetched: %d" % len(raw_tweets))
+	sys.stdout.flush()
+	temp_raw_tweets = api.user_timeline(screen_name=username, max_id=last_tweet_id, include_rts=False, exclude_replies=True)  #read the timeline relative to max_id (the IDs of Tweets it has already processed)
+
+	if len(temp_raw_tweets) == 0:
+		break
+	else:
+		last_tweet_id = int(temp_raw_tweets[-1].id-1)
+		raw_tweets = raw_tweets + temp_raw_tweets
+
+print ('\nFinished fetching ' + str(min(len(raw_tweets),max_tweets)) + ' Tweets.')
+
+
+#obtaining the full path for the images in raw_tweets
+print ('\nCollecting Media URLs.....')
+tweets_with_media = set()
+for tweet in raw_tweets:
+	media = tweet.entities.get('media',[])
+	if (len(media)>0):
+		tweets_with_media.add(media[0]['media_url'])
+		sys.stdout.write("\rMedia Links fetched: %d" % len(tweets_with_media))
+		sys.stdout.flush()
+print ('\nFinished fetching ' + str(len(tweets_with_media)) + ' Links.')
+
+
+
+#Download the images into /twitter_images/"username"
+print ('\nDownloading Images.....')
+try:
+    os.mkdir('twitter_images')
+    os.chdir('twitter_images')
+except:
+	os.chdir('twitter_images')
+
+try:
+    os.mkdir(username)
+    os.chdir(username)
+except:
+	os.chdir(username)
+
+for url in tweets_with_media:
+	wget.download(url)
+print ('\n\nFinished Downloading.\n')
