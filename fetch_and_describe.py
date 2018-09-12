@@ -1,3 +1,9 @@
+#!/usr/bin/python
+
+''' 
+Credit to: Krishanu Konar, GoogleCloudPlatform/python-docs-examples
+modified by: Xun(Scott) Lin
+'''
 import tweepy
 from tweepy import OAuthHandler
 import json
