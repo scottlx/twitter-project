@@ -102,7 +102,7 @@ def recognizing():
 		response = client.label_detection(image=image)
 		labels = response.label_annotations
 		print(index)
-		subs.append(srt.Subtitle(index=index, start=timedelta(seconds=index), end=timedelta(seconds=index+1), content=labels[1].description)) #write the first label into subtitle
+		subs.append(srt.Subtitle(index=index, start=timedelta(seconds=index), end=timedelta(seconds=index+1), content=labels[0].description)) #write the first label into subtitle
 		with open("output.csv", "a") as f:
 			writer = csv.writer(f)
 			row=[]
