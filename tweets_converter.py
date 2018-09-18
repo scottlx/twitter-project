@@ -27,27 +27,30 @@ def get_tweets(username, max_tweets, api):
 	except Exception as e:
 		print (e)
 		sys.exit()
+	if raw_tweets:
+		last_tweet_id = int(raw_tweets[-1].id-1)
+		
+		print ('\nFetching tweets.....')
 
-	last_tweet_id = int(raw_tweets[-1].id-1)
-	
-	print ('\nFetching tweets.....')
+		if max_tweets == 0:
+			max_tweets = 3500   #if max_tweets is 0, fetch all tweets
 
-	if max_tweets == 0:
-		max_tweets = 3500   #if max_tweets is 0, fetch all tweets
+		while len(raw_tweets)<max_tweets:
+			sys.stdout.write("\rTweets fetched: %d" % len(raw_tweets))
+			sys.stdout.flush()
+			temp_raw_tweets = api.user_timeline(screen_name=username, max_id=last_tweet_id, include_rts=False, exclude_replies=True)  #read the timeline relative to max_id (the IDs of Tweets it has already processed)
 
-	while len(raw_tweets)<max_tweets:
-		sys.stdout.write("\rTweets fetched: %d" % len(raw_tweets))
-		sys.stdout.flush()
-		temp_raw_tweets = api.user_timeline(screen_name=username, max_id=last_tweet_id, include_rts=False, exclude_replies=True)  #read the timeline relative to max_id (the IDs of Tweets it has already processed)
+			if len(temp_raw_tweets) == 0:
+				break
+			else:
+				last_tweet_id = int(temp_raw_tweets[-1].id-1)
+				raw_tweets = raw_tweets + temp_raw_tweets
 
-		if len(temp_raw_tweets) == 0:
-			break
-		else:
-			last_tweet_id = int(temp_raw_tweets[-1].id-1)
-			raw_tweets = raw_tweets + temp_raw_tweets
-
-	print ('\nFinished fetching ' + str(min(len(raw_tweets),max_tweets)) + ' Tweets.')
-	return raw_tweets
+		print ('\nFinished fetching ' + str(min(len(raw_tweets),max_tweets)) + ' Tweets.')
+		return raw_tweets
+	else:
+		print('Seriously? This user did not post any tweets')
+		sys.exit()
 
 def get_URL(raw_tweets):
 	#obtaining the full path for the images in raw_tweets
