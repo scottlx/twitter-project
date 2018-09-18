@@ -33,4 +33,4 @@
    >>>```
  >> 3. Make sure you have your tweepy token and google-cloud keys
  
- >> 4. run!
+ >> 4. Run!
