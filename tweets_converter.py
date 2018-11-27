@@ -14,6 +14,8 @@ from google.cloud import vision
 from google.cloud.vision import types
 import csv
 import srt
+import pymysql
+import datetime
 from datetime import timedelta
 
 
@@ -92,11 +94,12 @@ def recognizing():
 	client = vision.ImageAnnotatorClient()
 	print (os.getcwd())
 	CURRENT_PATH = os.getcwd()
+	relevant_path = glob.glob('*.jpg')
 	image_paths = glob.glob(os.path.join(CURRENT_PATH, '*.jpg'))
-	image_paths.sort()
-	print ("Number of images: ", len(image_paths));
+	print ("Number of images: ", len(image_paths))
 
 	subs =[]
+	description=[]
 
 	for index, file_name in enumerate(image_paths):
 		with io.open(file_name, 'rb') as image_file:
@@ -106,6 +109,7 @@ def recognizing():
 		labels = response.label_annotations
 		print(index)
 		subs.append(srt.Subtitle(index=index, start=timedelta(seconds=index), end=timedelta(seconds=index+1), content=labels[0].description)) #write the first label into subtitle
+		description.append(labels[0].description)
 		with open("output.csv", "a") as f:
 			writer = csv.writer(f)
 			row=[]
@@ -117,5 +121,68 @@ def recognizing():
 			s.write(srt.compose(subs))
 	s.close()
 	f.close()
+	return description,relevant_path
+
+def mysql_save(user_name,twitter_name,twitter_id,lb,url):
+	# Open database connection
+	db = pymysql.connect("localhost","scott","445566","test" )
+
+	# prepare a cursor object using cursor() method
+	cursor = db.cursor()
 
 
+	# Create table as per requirement
+	new = """CREATE TABLE IF NOT EXISTS `TwitterRecord` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_name` VARCHAR(45) DEFAULT NULL,
+	`twitter_username` VARCHAR(45) DEFAULT NULL,
+	`twitter_id` VARCHAR(45) DEFAULT NULL,
+	`label` VARCHAR(45) DEFAULT NULL,
+	`url` VARCHAR(2083) DEFAULT NULL,
+	`time` DATETIME,
+	PRIMARY KEY (`id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;"""
+
+	cursor.execute(new)
+	print("Created table Successfull.")
+
+
+
+	# Prepare SQL query to INSERT a record into the database.
+	ins = "INSERT INTO TwitterRecord (USER_NAME,TWITTER_USERNAME, TWITTER_ID, LABEL, URL, TIME) \
+		VALUES ('%s','%s','%s','%s','%s','%s')" % \
+		(user_name,twitter_name,twitter_id,lb,url,datetime.datetime.now())
+	try:
+		cursor.execute(ins)
+		# Commit your changes in the database
+		db.commit()
+	except:
+		# Rollback in case there is any error
+		db.rollback()
+
+	print (ins)
+	print('Yes, Insert Successfull.')
+	# disconnect from server
+	db.close()
+
+def mysql_search(keyword):
+	# Open database connection
+	db = pymysql.connect("localhost","scott","445566","test" )
+
+	# prepare a cursor object using cursor() method
+	cursor = db.cursor()
+
+	sql = 'SELECT * FROM TwitterRecord WHERE ( user_name LIKE "%{}%"'.format(keyword)+'OR twitter_username LIKE "%{}%"'.format(keyword) +'OR twitter_id LIKE "%{}%"'.format(keyword) +'OR label LIKE "%{}%"'.format(keyword)+'OR url LIKE "%{}%"'.format(keyword) +'OR time LIKE "%{}%")'.format(keyword)
+	try:
+		cursor.execute(sql)
+		# Fetch all the rows in a list of lists.
+		results = cursor.fetchall()
+		for row in results:
+			print (row)
+	except:
+		import traceback
+		traceback.print_exc()
+		print ("Error: unable to fetch data")
+
+	# disconnect from server
+	db.close()
