@@ -162,3 +162,13 @@ def mongo_search(field, keyword):
 			print(post)
 	except:
 		raise Exception("Find data failed")
+
+def mongo_count(keyword):
+	client = MongoClient('localhost',27017)
+
+	db = client.twitter_mongodb
+
+	try:
+		print(db.posts.find({"twitter_username": keyword}).count())
+	except:
+		raise Exception("Count failed")

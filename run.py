@@ -48,7 +48,13 @@ else:
 	print('No images in the twitter feed')
 	sys.exit()
 
-
+print ("============ Press `Enter` to start searching ...")
+input()
 field = input("\nEnter the Field (user_name, twitter_username, twitter_id, label, url, time) you want to search: ")
 keyword = input("\nEnter the searching keyword: ")
 tweets_converter.mongo_search(field, keyword)
+
+print ("============ Press `Enter` to count the number of images per feed ...")
+input()
+feed = input("\nEnter a twitter user name: ")
+tweets_converter.mongo_count(feed)
