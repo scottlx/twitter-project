@@ -6,10 +6,10 @@ import tweets_converter
 import tweepy
 from tweepy import OAuthHandler
 
-consumer_key = 'z2lLnyy4SOi2TpaBAsGVn0pty'
-consumer_secret = 'wc47vwSyvNuT4HZFFoBxBMEhXmRSdsdbQcX15zNjxTKkvnc1xo'
-access_token = '1038838122061160455-7KG4IXXpsMNvDy0wGPkhqMAeSyg5kT'
-access_secret = 'Ez2eeD9YyFyr7iWLzfRl8uMbL7IH5lGVrg72uOPiIbfkP'
+consumer_key = 'JJLhC7QSHGmNJlVexDnNuCXY2'
+consumer_secret = '54xkXLWXQDTc89kv0RnGvfWcFJPIezaMUQWYrZ6MrZZyVempsb'
+access_token = '1038838122061160455-HWxQ4alHDV1qgzRwuropLKM6Qb4XtV'
+access_secret = '6O7T5jIGnTjD4ibeJM43jePp8ru6lkMDLJzDIKMeTXAlW'
 
 #Authentication
 auth = OAuthHandler(consumer_key, consumer_secret)
