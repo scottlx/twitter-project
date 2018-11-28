@@ -1,36 +1,15 @@
 # twitter-project
- A library that downloads images from a twitter feed, convert them to a video and describe the content of the images in the video.
+MongoDB implementation  
 
->How to start
+Requirment:
+1. [MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)  
 
->>1. Make sure you have pip installed
+2. [Pymongo](https://api.mongodb.com/python/current/)  
+`$ python -m pip install pymongo`
 
->>2. Install following dependencies:
-  
-  >>>tweepy
-   >>>```Bash
-   >>>pip install tweepy
-   >>>```
-  
- >>> ffmpeg
-  >>> ```Bash
-   >>>sudo add-apt-repository ppa:mc3man/trusty-media  
-   >>>sudo apt-get update  
-   >>>sudo apt-get install ffmpeg  
-   >>>sudo apt-get install frei0r-plugins  
-   >>>```
-   >>>wget
-   >>>```Bash
-   >>>pip install wget
-  >>> ```
-  >>>srt
-   >>>```Bash
-   >>>pip install srt
-  >>> ```
-  >>> Google Cloud Vision
-   >>>```Bash
-   >>>pip install --upgrade google-cloud-vision
-   >>>```
- >> 3. Make sure you have your tweepy token and google-cloud keys
- 
- >> 4. Run!
+Function added:  
+
+mongo_save(), mongo_search(), mongo_count()  
+
+Demo: Simply run
+`$ python run.py`
