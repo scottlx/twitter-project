@@ -14,6 +14,9 @@ from google.cloud import vision
 from google.cloud.vision import types
 import csv
 import srt
+import pymongo
+import datetime
+from pymongo import MongoClient
 from datetime import timedelta
 
 
@@ -92,11 +95,12 @@ def recognizing():
 	client = vision.ImageAnnotatorClient()
 	print (os.getcwd())
 	CURRENT_PATH = os.getcwd()
+	relevant_path = glob.glob('*.jpg')
 	image_paths = glob.glob(os.path.join(CURRENT_PATH, '*.jpg'))
-	image_paths.sort()
-	print ("Number of images: ", len(image_paths));
+	print ("Number of images: ", len(image_paths))
 
 	subs =[]
+	description=[]
 
 	for index, file_name in enumerate(image_paths):
 		with io.open(file_name, 'rb') as image_file:
@@ -106,6 +110,7 @@ def recognizing():
 		labels = response.label_annotations
 		print(index)
 		subs.append(srt.Subtitle(index=index, start=timedelta(seconds=index), end=timedelta(seconds=index+1), content=labels[0].description)) #write the first label into subtitle
+		description.append(labels[0].description)
 		with open("output.csv", "a") as f:
 			writer = csv.writer(f)
 			row=[]
@@ -117,5 +122,43 @@ def recognizing():
 			s.write(srt.compose(subs))
 	s.close()
 	f.close()
+	return description,relevant_path
 
 
+def mongo_save(user_name,twitter_name,twitter_id,lb,url):
+
+	client = MongoClient('localhost',27017)
+
+	db = client.twitter_mongodb
+
+
+	post = {"user_name": user_name,
+		"twitter_username": twitter_name,
+		"twitter_id": twitter_id,
+		"label": lb,
+		"url": url,
+		"time": datetime.datetime.utcnow()}
+	try:
+		posts = db.posts
+		posts.insert_one(post).inserted_id
+	except:
+		raise Exception("insert document failed")
+
+
+
+def mongo_search(field, keyword):
+
+	client = MongoClient('localhost',27017)
+
+	db = client.twitter_mongodb
+
+
+	condition = {}
+	condition['$regex'] = keyword
+	filter = {}
+	filter[field] = condition
+	try:
+		for post in db.posts.find(filter):
+			print(post)
+	except:
+		raise Exception("Find data failed")

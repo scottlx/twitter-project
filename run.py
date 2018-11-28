@@ -19,6 +19,7 @@ api = tweepy.API(auth)
 
 
 while True:
+	myname = input("\nEnter your name: ")
 	username = input("\nEnter the twitter handle of the Account to download media from: ")
 	try:
 		u=api.get_user(username)
@@ -34,7 +35,12 @@ all_tweets = tweets_converter.get_tweets(username,max_tweets,api)
 media_URLs = tweets_converter.get_URL(all_tweets)
 if media_URLs:
 	tweets_converter.downloadImages(media_URLs,username)
-	tweets_converter.recognizing()
+	label,paths = tweets_converter.recognizing()
+	i=0
+	for lb in label:
+		url= 'http://pbs.twimg.com/media/'+paths[i]
+		i=i+1
+		tweets_converter.mongo_save(myname,u.screen_name,u.id_str,lb,url)
 	# use ffmpeg command to convert the images and subtitle into a video
 	os.system('ffmpeg -framerate 1 -pattern_type glob -i \'*.jpg\' -vf \"scale=\'min(1280,iw)\':min\'(720,ih)\':force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2 , subtitles=subtitle.srt\" output.mp4')
 
@@ -42,3 +48,7 @@ else:
 	print('No images in the twitter feed')
 	sys.exit()
 
+
+field = input("\nEnter the Field (user_name, twitter_username, twitter_id, label, url, time) you want to search: ")
+keyword = input("\nEnter the searching keyword: ")
+tweets_converter.mongo_search(field, keyword)
