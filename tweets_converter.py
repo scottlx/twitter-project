@@ -186,3 +186,25 @@ def mysql_search(keyword):
 
 	# disconnect from server
 	db.close()
+
+def mysql_group():
+	# Open database connection
+	db = pymysql.connect("localhost","scott","445566","test" )
+
+	# prepare a cursor object using cursor() method
+	cursor = db.cursor()
+
+	sql = 'SELECT twitter_username, COUNT(*) from TwitterRecord group by twitter_username ;'
+	try:
+		cursor.execute(sql)
+		# Fetch all the rows in a list of lists.
+		results = cursor.fetchall()
+		for row in results:
+			print (row)
+	except:
+		import traceback
+		traceback.print_exc()
+		print ("Error: unable to group the data")
+
+	# disconnect from server
+	db.close()

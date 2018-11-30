@@ -6,10 +6,10 @@ import tweets_converter
 import tweepy
 from tweepy import OAuthHandler
 
-consumer_key = 'Mhi0eHP1VHR7kbFeW5jaWPZvQ'
-consumer_secret = '6kX1Hz743Kw0pEYsluU4AJzBKEqJofl4Ay7u36bLUfB1b3gxzJ'
-access_token = '1038838122061160455-n67qK1qNV8yjtYkEpSDclKCfhoIpHF'
-access_secret = 'HyFxExkSw7VvCh4zR249eBJChbCBPMwvy6wE3jxhLcIpz'
+consumer_key = ''
+consumer_secret = ''
+access_token = ''
+access_secret = ''
 
 #Authentication
 auth = OAuthHandler(consumer_key, consumer_secret)
@@ -48,6 +48,10 @@ else:
 	print('No images in the twitter feed')
 	sys.exit()
 
+print ("============ Press `Enter` to start searching ...")
+input()
 keyword = input("\nEnter the keyword you want to search: ")
 tweets_converter.mysql_search(keyword)
-
+print ("============ Press `Enter` to count the number of images per feed ...")
+input()
+tweets_converter.mysql_group()
