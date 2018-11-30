@@ -1,36 +1,15 @@
 # twitter-project
- A library that downloads images from a twitter feed, convert them to a video and describe the content of the images in the video.
+MySQL implementation  
 
->How to start
+Requirment:
+1. [MySQL](https://dev.mysql.com/doc/refman/8.0/en/linux-installation.html)  
 
->>1. Make sure you have pip installed
+2. [PyMysql](https://github.com/PyMySQL/PyMySQL)  
+`$ python3 -m pip install PyMySQL`
 
->>2. Install following dependencies:
-  
-  >>>tweepy
-   >>>```Bash
-   >>>pip install tweepy
-   >>>```
-  
- >>> ffmpeg
-  >>> ```Bash
-   >>>sudo add-apt-repository ppa:mc3man/trusty-media  
-   >>>sudo apt-get update  
-   >>>sudo apt-get install ffmpeg  
-   >>>sudo apt-get install frei0r-plugins  
-   >>>```
-   >>>wget
-   >>>```Bash
-   >>>pip install wget
-  >>> ```
-  >>>srt
-   >>>```Bash
-   >>>pip install srt
-  >>> ```
-  >>> Google Cloud Vision
-   >>>```Bash
-   >>>pip install --upgrade google-cloud-vision
-   >>>```
- >> 3. Make sure you have your tweepy token and google-cloud keys
- 
- >> 4. Run!
+Function added:  
+
+mysql_save(), mysql_search()
+
+Demo: Simply run
+`$ python run.py`
